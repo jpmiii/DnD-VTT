@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <TITLE>{{objs.auth}} Game Home</TITLE>
+  <link rel='stylesheet' type='text/css' href='style.css'>
+  <style>
+  </style>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+</head>
+
+
+
+<body onload="loadFunction()">
+
+<h3>Game Home</h3>
+
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab1')">Characters</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab5')">Links</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab2')">Messages</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab4')">Items</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab3')">Edit</a></li>
+  <div style="text-align:right;"><a href="tracker">Tracker</a> | <a href='home'>Home Page</a></div>
+</ul>
+
+<div id="tab1" class="tabcontent">
+  <br />
+
+  {% for k in objs %}
+  {% if 'Sheet' in objs[k] %}
+  {% if objs[k]['gametype']=='Character' %}
+  <a href="sheet?{{ k }}">{{ objs[k]['Name'] }}</a> </br>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+
+</div>
+
+
+<div id="tab5" class="tabcontent">
+  <br />
+  <a href="tracker">Tracker</a><br/>
+  <br/>
+  <a href="soundboard">soundboard</a><br/>
+
+  <a href="restore">restore</a><br/>
+
+  <a href="https://drive.google.com/drive/folders/1t2BcRHrFOHS4VouNViWSZ17-0H9zOppH?usp=sharing">Google downloads</a><br/>
+  <a href="harnchargen.html">Harn Character Generator</a><br/>
+  {% for k in objs %}
+  {% if 'Sheet' in objs[k] %}
+  {% if objs[k]['gametype']!='Character' %}
+  <a href="sheet?{{ k }}">{{ objs[k]['Name'] }}</a> </br>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+
+  <br><br>
+
+</div>
+
+<div id="tab2" class="tabcontent">
+
+  {% for k in objs %}
+  {% if objs[k]['gametype'] == "Message" %}
+  <a href="viewmessage?id={{ k }}">{{ objs[k]['subject'] }}</a></br>
+  {% endif %}
+  {% endfor %}
+
+</div>
+
+
+<div id="tab3" class="tabcontent">
+  <h3>Sheet</h3>
+  <form action='edit' method='post' target='editresult'>
+    <input type='hidden' name='key' value='{{objs.auth}} home'> <textarea name="text">{{ objs[objs.auth]["home"] }}</textarea><br />
+
+    <input type='submit' value='edit' name='action'>
+  </form>
+
+  <br />
+  <iframe height=100 width=200 srcdoc="<p>0</p>" name="editresult">
+    <p>Your browser does not support iframes.</p>
+  </iframe>
+
+  <br />
+
+
+
+
+  <!-- Include stylesheet -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+  <!-- Create the editor container -->
+  <form id="quillform" action='edit' method='post' target='editresult'>
+    <input type="hidden" name="text" id="quilltextid">
+    <input type='hidden' name='key' value='{{objs.auth}} quilltext'>
+  <div id="editor">
+
+  </div>
+    <input type='submit' value='edit' name='action'>
+  </form>
+
+  <p>
+    <a href='base'>Base</a>
+</p>
+
+</div>
+
+
+
+<div id="tab4" class="tabcontent">
+  {% for k in objs %}
+  {% if objs[k]['gametype']!='Message' and objs[k]['gametype']!='Character' and objs[k]['gametype']!='User' %}
+  {% if "viewt" not in objs[k] and "gametype" in objs[k] %}<form style="display: inline;" action='listedit' method='post' id='form_edit{{k}}'>  <input type='hidden' name='key' value='{{k}}'><input type='hidden' value='edit' name='action'><a href='javascript: submitVForm("form_edit{{k}}")'>{{ k }}</a></form><form style="display: inline;" action='listedit' method='post' id='form_json{{k}}'>  <input type='hidden' name='key' value='{{k}}'><input type='hidden' value='json' name='action'><a href='javascript: submitVForm("form_json{{k}}")'>{{ objs[k]['gametype'] }} </a></form><br>
+  {% endif %}{% endif %}
+  {% endfor %}
+  <br/>
+  {% for k in objs %}
+  {% if 'Sheet' in objs[k] %}
+  {% if objs[k]['gametype']!='Character' %}
+  {% if "viewt" not in objs[k] %}
+  <a href="sheet?{{ k }}">{{ objs[k]['Name'] }}</a> {{ objs[k]['write'][0] }} </br>
+  {% endif %}
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+</div>
+
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('myModal')">×</span>
+    <p>Some text in the Modal..</p>
+  </div>
+
+</div>
+
+<div id="roller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('roller')">×</span>
+
+
+
+
+    <form action="roller" method="post" target="rollerresult">
+      <input type="hidden" name="key" value="{{ objs.key }}" />
+
+
+      <iframe height=400 width=200 srcdoc="<p>0</p>" name="rollerresult">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+
+
+
+      <input type="hidden" name='roll_name' id='rollnameid'>
+
+      <div id="rollhtml"></div>
+      Roll String: <input type="text" name="roll_string" value="d20"></br>
+      Target: <input type="number" name="roll_target" value=8></br>
+      Modifier: <input type="number" name="Modifier_mod" value=0>
+
+
+
+      <input type="submit" value="Roll">
+
+    </form>
+
+    </p>
+  </div>
+
+</div>
+
+<div id="skillroller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('skillroller')">×</span>
+    <div style="display:inline-block;vertical-align:top;text-align:center;">
+      <form id="skillrollform" action="roller" method="post" target="skillrollerresult">
+        <input type="hidden" name="key" value="{{ objs.key }}" />
+
+        <input type="hidden" name='roll_name' id='skillrollnameid'>
+        <input type="hidden" name='Skill_Mod_key' id='skillrollkeyid'>
+
+        <input type="hidden" name='Attribute_Mod_key' id='attmodkeyid'>
+
+        <div id="skillrollhtml" style="display:inline;"> </div>  <br>
+        Roll String: <input type="text" name="roll_string" value="d20" style="width:40px;border:0;"><br>
+        Target: <input type="number" name="roll_target" value=8 style="width:38px;border:0;"><br>
+        Modifier: <input type="number" name="Modifier_mod" value=0 style="width:38px;border:0;"><br>
+
+        <a href='javascript: submitVForm("skillrollform")'> Roll</a>
+
+
+
+      </form>
+    </div>
+    <iframe height=300 width=300 srcdoc="<p>0</p>" name="skillrollerresult">
+      <p>Your browser does not support iframes.</p>
+    </iframe>
+
+
+  </div>
+
+</div>
+
+
+
+<div id="VariableModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('VariableModal')">×</span>
+    <div id="innerVariable"></div>
+  </div>
+
+</div>
+
+<p>
+  <a href='home'>Home</a>
+</p>
+
+
+<script>
+
+var toolbarOptions = [
+                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                ['blockquote', 'code-block'],
+
+                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+                [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+                [{ 'direction': 'rtl' }],                         // text direction
+
+                [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [ 'link', 'image', 'video', 'formula' ],          // add's image support
+                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+
+                ['clean']                                         // remove formatting button
+            ];
+
+function openTabb(evt, tabbName) {
+
+    var i, tabcontent, tablinks, subtabcontent;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    subtabcontent = document.getElementsByClassName("subtabcontent");
+    for (i = 0; i < subtabcontent.length; i++) {
+        subtabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabbName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function openSubTabb(evt, tabbName) {
+
+    var i, subtabcontent, subtablinks;
+    subtabcontent = document.getElementsByClassName("subtabcontent");
+    for (i = 0; i < subtabcontent.length; i++) {
+        subtabcontent[i].style.display = "none";
+    }
+    subtablinks = document.getElementsByClassName("subtablinks");
+    for (i = 0; i < subtablinks.length; i++) {
+        subtablinks[i].className = subtablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabbName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function loadFunction() {
+	document.getElementById("tab1").style.display = "block";
+}
+
+
+function openRollerModal(roll) {
+    modal = document.getElementById("roller");
+	rollname = document.getElementById("rollnameid");
+	rollname.value = roll
+    tv = document.getElementById("rollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+
+function openSkillRoller(roll) {
+    modal = document.getElementById("skillroller");
+	rollname = document.getElementById("skillrollnameid");
+	rollname.value = roll
+	key1 = document.getElementById("skillrollkeyid");
+	key1.value = "- Skills "+roll+" level"
+	key2 = document.getElementById("attmodkeyid");
+	key2.value = "- Attributes "+skillattrs[roll]+" bonus"
+    tv = document.getElementById("skillrollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+function attmodchange() {
+	ele1 = document.getElementById("ta3");
+	ele2 = document.getElementById("ta4");
+	ele2.value = getAtt_mod(att_list[ele1.value])
+
+
+}
+
+function openModal(name) {
+    modal = document.getElementById(name);
+    modal.style.display = "block";
+}
+function openVModal(val) {
+    modal = document.getElementById("VariableModal");
+    modal.style.display = "block";
+    tv = document.getElementById("innerVariable");
+    tv.innerHTML = val;
+}
+
+function closeModal(name) {
+    modal = document.getElementById(name);
+    modal.style.display = "none";
+}
+function getAtt_mod_harn(att) {
+	if (att < 1) {return -3}
+	if (att < 3) {return -2}
+	if (att < 6) {return -1}
+	if (att < 9) {return 0}
+	if (att < 12) {return 1}
+	if (att < 15) {return 2}
+	if (att > 14) {return 3}
+	return 0;
+
+}
+function getAttMod(att) {
+        return Math.floor(att/2 - 5)
+}
+
+function submitVForm(form_id) {
+	f = document.getElementById(form_id)
+	f.submit()
+}
+
+  var quill = new Quill('#editor', {
+    modules: {
+                toolbar: toolbarOptions
+            },
+    theme: 'snow'
+  });
+quill.setHTML = (html) => {
+  quill.root.innerHTML = html;
+};
+
+// get html content
+quill.getHTML = () => {
+  return quill.root.innerHTML;
+};
+
+
+  {% if "quilltext" in objs[objs.auth] %}
+
+
+  quill.setHTML(`{{ objs[objs.auth]["quilltext"]|safe }}`);
+  {% endif %}
+  var quillform = document.getElementById('quillform')
+  quillform.onsubmit = function() {
+  // Populate hidden form on submit
+  var qtext = document.getElementById('quilltextid')
+  qtext.value = quill.getHTML();
+
+  console.log("Submitted", $(quillform).serialize(), $(quillform).serializeArray());
+
+  // No back end to actually submit to!
+  alert('Open the console to see the submit data!')
+  return false;
+};
+
+    </script>
+
+</body>
+
+
+
+
+</html>

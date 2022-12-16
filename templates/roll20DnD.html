@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <TITLE>{{ charx.Name }}</TITLE>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+    <style>
+    </style>
+</head>
+
+
+
+<body onload="loadFunction()">
+<div>
+  <form id='graph_form' action='listedit' method='post' style="display: inline;"><input type='hidden' name='key' value='{{ charx.key }}'><input type='hidden' name='action' value='edit'><a href='javascript: submitVForm("graph_form")' style="font-size:30px;">
+ {{ charx.Name }}</a> </form><form id='json_form' action='listedit' method='post' style="display: inline;"><input type='hidden' name='key' value='{{ charx.key }}'><input type='hidden' name='action' value='json'><a href='javascript: submitVForm("json_form")'><div style="font-size: 8px;display: inline;">
+  json</div></a> </form>
+</div>
+<div>
+
+Class / Level: {{ charx.class_display }} - Background: {{ charx.background }}
+</div>
+<div>
+
+Race:  {{ charx.race_display }} - Alignment: {{ charx.alignment }} - Experience Points: {{ charx.experience }}
+
+</div>
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab1')">Main</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab2')">Spells</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab3')">Traits</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab4')">Equipment</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab5')">Bio</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab6')">Mods</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab7')">Other</a></li>
+  <div style="text-align:right;"><a href="javascript:tabrefresh()">Refresh</a>&nbsp;&nbsp; <a href='tracker'>Tracker</a>&nbsp;&nbsp; <a href='home'>Home Page</a></div>
+</ul>
+
+<div id="tab1" class="tabcontent">
+<div class="grid-main">
+  <div>
+  <div style="font-size: 24px;">
+    Ability Scores
+    </div>
+  <div class="grid-2">
+
+<!-- ability start -->
+ 
+
+{% for ab in charx.abilities %}
+<div style="border-style: outset; padding: 4px;width:60px;border-radius: 20px; text-align: center;">
+  <div style="font-size: 10px;">{{ charx.ability_names[loop.index0] }}</div>
+  <div style="font-size: 20px;display: inline;text-align: center;">
+
+
+
+
+        <form id="{{ ab }}abilityrollform" action="roller" method="post">
+          <input type="hidden" name="key" value="{{ charx.key }}"/>
+        
+            <input type="hidden" name='roll_name' value='{{ charx.ability_names[loop.index0] }}'>
+            <input type="hidden" name='roll_type' value='ability'>
+  
+      
+      <input type="hidden" name='Attribute_Mod_key' value='- {{ charx.abilities[ab] }}'>
+      <input type="hidden" name='roll_string' value='1d20' id="{{ ab }}rollclickability">
+      <input type="hidden" name='quiet' id="{{ ab }}rollclickquiet">
+
+              <label onclick='rollclick(event,"abilityresponse", "{{ ab }}rollclickability","{{ ab }}abilityrollform","{{ ab }}rollclickquiet")'>{{ charx[charx.abilities[ab]] }} </label>
+      </form>
+     
+
+  
+     
+
+
+
+  
+   </div> 
+  <div style="font-size: 14px;display: inline;text-align: center;">
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} {{ ab }}"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ charx[ab] }}" name="text" style="border:0;width:24px;"  onchange="javascript: submit()"> </form> 
+  
+  </div>
+</div>
+{% endfor%}
+ 
+
+
+<!-- abiliry end -->
+
+  </div>
+  <div style="font-size: 20px;">
+    Saving Throws
+    </div>
+  <div class="grid-2">
+
+
+<!-- saving throws start-->
+
+{% for ab in charx.saving_throws %}
+<div style="border-style: outset; padding: 4px;width:60px;border-radius: 20px; text-align: center;">
+  <div style="font-size: 10px;display: inline;">{{ charx.ability_names[loop.index0] }}<br></div>
+  <div style="font-size: 16px;display: inline;text-align: center;">
+    
+    
+
+
+
+
+    <form id="{{ ab[0] }}saverollform" action="roller" method="post" >
+      <input type="hidden" name="key" value="{{ charx.key }}">
+    
+        <input type="hidden" name='roll_name' value='{{ charx.ability_names[loop.index0] }} Save'>
+        <input type="hidden" name='roll_type' value='save'>
+
+  
+  <input type="hidden" name='Attribute_Mod_key' value='- {{ ab[0] }}'>
+  <input type="hidden" name='Proficiency_key' value='- {{ ab[1] }}'>
+  <input type="hidden" name='roll_string' value='1d20' id="{{ ab[0] }}rollclicksave">
+  <input type="hidden" name='quiet' id="{{ ab[0] }}srollclickquiet">
+          <label onclick='rollclick(event,"abilityresponse", "{{ ab[0] }}rollclicksave","{{ ab[0] }}saverollform", "{{ ab[0] }}srollclickquiet")'>{{ charx[ab[0]] }} </label>
+  </form>
+ 
+
+ 
+
+  <form action="edit" method="post" target="editresult" id="{{ab[0]}}_checked"> 
+    <input type="hidden" name="key" value="{{ charx.key }} {{ ab[1] }}"> 
+    <input type="hidden" value="edit" name="action">
+     <input type="checkbox" onclick="javascript: submit();" value="{{ charx['pb']}}" name="text" style="border:0;width:12px;" {% if charx[ab[1]]>=1 %}checked{% endif %}>
+    </form> 
+
+
+    
+   <!-- <br> --></div> 
+  <div style="font-size: 14px;display: inline;text-align: center;">
+
+
+  </div>
+</div>
+    
+
+{% endfor%}
+
+
+<!-- savinmg throws end -->
+
+  </div>
+
+
+
+</div>
+<div><br>
+Proficiency Bonus: {{ charx.pb}} <br><br>
+  <div style="font-size: 20px;">
+Skills
+    </div>
+
+    <!-- skills start -->
+    {% for sk in charx.skill_mods %}
+  <div style="font-size: 16px;display:flex"> 
+    <form action="edit" method="post" target="editresult" id="{{sk}}_checked"> 
+    <input type="hidden" name="key" value="{{ charx.key }} {{ charx.skill_mods[sk]['prof'] }}"> 
+    <input type="hidden" value="edit" name="action">
+     <input type="checkbox" onclick="javascript: submit()" ; value="{{ charx.pb }}" name="text" style="border:0;width:15px;" {% if charx[charx.skill_mods[sk]['prof']]>=1 %}checked{% endif %}> 
+    </form>   
+    <a title="{{ charx.skill_mods[sk]['ability'] }}" href="javascript: openSkillRoller('{{ charx.skill_names[loop.index0] }}', {{ charx[charx.skill_mods[sk]['bonus']] }})">{{ charx.skill_names[loop.index0] }}</a>
+
+
+  </div>
+{% endfor%}
+  <!-- skills end -->
+  Inspiration: {{ charx.inspiration }}</br>
+</div>  
+<div><br><div style="margin: left;" id="abilityresponse"></div>
+  <br>
+  
+  <div style="border-style: outset; padding: 10px; width:max-content;">
+    <div style="font-size: 24px;">
+    Attacks
+    </div>
+  
+      <table border =1 padding="5">
+        <tr>
+          <th>Name</th>
+          <th>Bonus</th><th>Damage<br>Dice</th><th>Damage<br>Bonus</th>
+          <th>Damage</th>
+          <th>Range</th>
+          
+        </tr>
+  {% for i in charx.attack %}
+        <tr>
+          <td> 
+
+            
+            {% if  "spelllevel" in charx.attack[i] and charx.attack[i].atkflag == 0 %}{{ charx.attack[i].atkname }}{% else %}<form id="{{ charx.attack[i].atkname }}attackrollform" action="roller" method="post">
+              <input type="hidden" name="key" value="{{ charx.key }}"/>
+            
+                <input type="hidden" name='roll_name' value='{{ charx.attack[i].atkname }}'>
+                <input type="hidden" name='roll_type' value='attack'>
+                <input type="hidden" name='damage_dice' value='{{charx.attack[i].dmgbase}}'>
+                <input type="hidden" name='damage_bonus' value='{{charx.attack[i].dmgmod}}'>
+          
+          <input type="hidden" name='Attack Bonus_key' value='- attack {{ i }} atkbonus'>
+          <input type="hidden" name='roll_string' value='1d20' id="{{ charx.attack[i].atkname }}rollclickattack">
+          <input type="hidden" name='quiet' id="{{ charx.attack[i].atkname }}rollclickquiet">
+        
+                  <label onclick='rollclick(event,"abilityresponse", "{{ charx.attack[i].atkname }}rollclickattack","{{ charx.attack[i].atkname }}attackrollform","{{ charx.attack[i].atkname }}rollclickquiet")'>{{ charx.attack[i].atkname }}</label>
+          </form>{% endif %}
+
+          
+          </td>
+          <td> 
+            
+          
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} attack {{ i }} atkbonus"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.attack[i].atkbonus }}" name="text" style="border:0;width:40px;"  onchange="javascript: submit()"> </form> 
+          </td>
+          <td> 
+            
+          
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} attack {{ i }} dmgbase"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ charx.attack[i].dmgbase }}" name="text" style="border:0;width:55px;"  onchange="javascript: submit()"> </form> 
+          </td>
+          <td> 
+            
+          
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} attack {{ i }} dmgmod"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.attack[i].dmgmod }}" name="text" style="border:0;width:30px;"  onchange="javascript: submit()"> </form> 
+          </td>
+          <td> 
+
+
+            <form id="{{ charx.attack[i].atkname }}damagerollform" action="roller" method="post">
+              <input type="hidden" name="key" value="{{ charx.key }}"/>
+            
+                {% if  charx.attack[i].dmgtype == "Healing" %}<input type="hidden" name='roll_name' value='{{ charx.attack[i].atkname }}'>
+                <input type="hidden" name='roll_type' value='healing'>{% else %}<input type="hidden" name='roll_name' value='{{ charx.attack[i].atkname }} Damage'>
+                <input type="hidden" name='roll_type' value='damage'>{% endif %}
+        
+          
+          
+          <input type="hidden" name='roll_string' value='{{ charx.attack[i].atkdmgtype }}' id="{{ charx.attack[i].atkname }}rollclickdamage">
+          <input type="hidden" name='quiet' id="{{ charx.attack[i].atkname }}rollclickquietd">
+        
+                  <label onclick='rollclick(event,"abilityresponse", "{{ charx.attack[i].atkname }}rollclickdamage","{{ charx.attack[i].atkname }}damagerollform","{{ charx.attack[i].atkname }}rollclickquietd")'>{{ charx.attack[i].atkdmgtype }}</label>
+          </form>      
+            
+
+          </td>
+          <td> 
+            {{ charx.attack[i].atkrange }}
+          
+          </td>
+
+        </tr>
+  {% endfor %}
+      </table>
+    </div>
+  
+  <br>
+  
+  <div class="grid-3" style="width:min-content">
+
+    <div style="border-style: outset; padding: 10px; width:min-content;">
+      <div class="grid-2">
+      <div>
+        Hit Points
+          <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} hp"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ charx.hp }}" name="text" style="border:0;font-size: 28px; width: 35px;"  onchange="javascript: submit()"> </form> 
+
+
+      </div>
+      <div>
+        <div style="font-size: 10px; display: inline; ">Temp:</div><div > <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} hp_temp"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ charx.hp_temp }}" name="text" style="border:0;font-size: 14px; width: 16px;"  onchange="javascript: submit()"> </form></div> 
+        <div style="font-size: 10px; display: inline; ">Max:</div><div style="font-size: 14px;">{{ charx.hp_max }}</div> 
+      </div>
+      </div>
+    
+      </div>
+
+    <div style="border-style: outset; padding: 10px">
+      <div style="font-size: 28px;" title="{{ charx.ac_desc }}">{{ charx.ac }}</div><div style="font-size: 10px;">Armor<br>Class</div>
+    </div>
+    <div style="border-style: outset; padding: 10px">
+      <div style="font-size: 28px;">
+        
+        
+        
+       
+
+        <form id="initrollform" action="roller" method="post" >
+          <input type="hidden" name="key" value="{{ charx.key }}"/>
+          <input type="hidden" name='Initiative_key' value='- initiative_bonus'>
+        
+            <input type="hidden" name='roll_name' value='Initiative'>
+            <input type="hidden" name='roll_type' value='init'>
+            <input type="hidden" name='quiet' id="initrollclickquiet">
+    
+
+      <input type="hidden" name='roll_string' id="rollclickinit">
+ 
+      <label onclick='rollclick(event,"abilityresponse", "rollclickinit","initrollform","initrollclickquiet")'> {{ charx.initiative_bonus }}</label>
+      
+      
+              <!-- <a href='javascript: submitVForm("initrollform")'>  </a> -->
+      </form>
+    
+       
+     
+        
+        
+        
+        </div><div style="font-size: 10px;">Initiative</div>
+    </div>
+
+
+
+
+  
+
+  <div style="border-style: outset; padding: 10px; ">
+    <div class="grid-2">
+      <div>
+
+        
+      </div>
+      <div>
+       
+
+      </div>
+    </div>
+
+  </div>
+  <div style="border-style: outset; padding: 10px">
+    <div style="font-size: 28px;">{{ charx.speed }}</div> <div style="font-size: 10px;">Speed</div>
+  </div>
+</div>  
+  <div style="border-style: outset; padding: 10px; width:min-content;">
+  </div>
+</div>
+<div>
+<br>
+
+
+</div>
+
+
+</div>
+</div>
+
+
+<div id="tab2" class="tabcontent">
+  
+
+
+ 
+  Spellcasting Ability: {{ charx.spellcasting_ability }} <br>
+  Spell Save DC: {{ charx.spell_save_dc }} <br>
+  Spell Attack Bonus: {{ charx.spell_attack_bonus }} <br>
+  <div style="font-size: 20px;">
+Spells
+  </div>
+  <table border="1">
+<tr>
+  <td colspan="2"  style="font-size: 12px;text-align: center;">Level 1 Slots</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">2</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">3</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">4</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">5</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">6</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">7</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">8</td>
+  <td colspan="2" style="font-size: 18px;text-align: center;">9</td>
+
+</tr><tr>
+<td style="font-size: 12px;">Available</td><td style="font-size: 12px;">Used</td>
+<td>A</td><td>U</td><td>A</td><td>U</td><td>A</td><td>U</td><td>A</td><td>U</td><td>A</td><td>U</td><td>A</td><td>U</td><td>A</td><td>U</td><td>A</td><td>U</td>
+</tr><tr>
+
+
+  <td>
+    {{ charx.lvl1_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl1_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl1_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl2_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl2_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl2_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl3_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl3_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl3_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl4_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl4_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl4_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl5_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl5_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl5_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl6_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl6_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl6_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl7_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl7_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl7_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl8_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl8_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl8_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+  <td>
+    {{ charx.lvl9_slots_total }}
+  </td><td>
+    <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} lvl9_slots_expended"> <input type="hidden" value="edit" name="action"> <input type="number" value="{{ charx.lvl9_slots_expended }}" name="text" style="border:0;width:34px;font-size: large;"  onchange="javascript: submit()"> </form> 
+  </td>
+</tr>
+
+  </table><table border="1"><tr><th> </th><th>Name</th><th>Level</th><th>Description</th><th>Range</th><th>Time</th><th>Duration</th><th>Target</th><th>Ability</th><th>Class</th><th>VSM</th><th>at higher levels</th><th>Concentration</th><th>output</th><th>ritual</th><th>save</th><th>save success</th><td>school</td><th>source</th><th>output DC</th></tr>
+{% for spl in ["spell-cantrip", "spell-1", "spell-2", "spell-3", "spell-4", "spell-5", "spell-6", "spell-7", "spell-8", "spell-9"] %}
+{% for s in charx[spl] %}
+<tr>
+<td>
+  <form action="edit" method="post" target="editresult" id="{{s}}checked"> 
+  <input type="hidden" name="key" value="{{ charx.key }} {{ spl }} {{ s }} options-flag"> 
+  <input type="hidden" value="edit" name="action">
+    <input type="checkbox" onclick="javascript: submit()" ; value="1" name="text" style="border:0;width:15px;" {% if charx[spl][s]['options-flag']==1 %}checked{% endif %}>
+  </form> 
+
+</td><td>
+<label >   {{ charx[spl][s]['spellname'] }} </label>
+
+</td><td>
+  {{ charx[spl][s]['spelllevel'] }}
+</td><td>
+<textarea style="height:8px;width:10px">{{ charx[spl][s]['spelldescription'] }} </textarea>
+
+</td>
+<td>
+  {{ charx[spl][s]['spellrange'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellcastingtime'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellduration'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spelltarget'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spell_ability'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellclass'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellcomp_m'] }}{{ charx[spl][s]['spellcomp_materials'] }}{{ charx[spl][s]['spellcomp_s'] }}{{ charx[spl][s]['spellcomp_v'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellathigherlevels'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellconcentration'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spelloutput'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellritual'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellsave'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellsavesuccess'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellschool'] }}
+</td>
+<td>
+  {{ charx[spl][s]['spellsource'] }}
+</td>
+<td>
+  {{ charx[spl][s]['roll_output_dc'] }}
+</td>
+
+</tr>
+
+{% endfor %}
+{% endfor %}
+
+  </table>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                
+</div>
+<!--  tab 3 ####################### -->
+
+
+<div id="tab3" class="tabcontent">
+<br>
+  <div class="grid-2">
+<div>
+
+  
+
+  Proficiencies<br>
+  
+  
+  <table border="1" style="font-size:small">
+    <tr>
+      <th> Name</th>
+      <th > Type</th>
+    </tr>
+    
+
+  {% for p in charx.proficiencies %}
+  <tr>
+  <td >{{charx.proficiencies[p]['name']}}</td>
+  <td >{{charx.proficiencies[p]['prof_type']}}</td>
+
+  </tr>
+
+
+
+  {% endfor %}
+
+
+  </table>
+
+
+
+</div>
+<div>
+  Traits<br>
+  <table border="1" style="font-size:small"><tr>
+      <th style="width: min-content;"> name</th>
+      <th style="width: min-content;"> source type</th>
+      <th style="width: min-content;"> source </th>
+      <th > description</th>
+
+  </tr>
+
+    {% for t in charx.traits %}<tr>
+    <td style="width: min-content;">{{charx.traits[t]['name']}}</td>
+    <td style="width: min-content;">{{charx.traits[t]['source_type']}}</td>
+    <td style="width: min-content;">{{charx.traits[t]['source']}}</td>
+    <td><textarea>{{charx.traits[t]['description']}}</textarea></td>
+
+    </tr>
+
+    
+    {% endfor %}
+  </table>
+</div>
+
+  </div>
+  
+
+  
+  
+
+</div>
+<div id="tab4" class="tabcontent">
+<br><br>
+  <div style="font-size: 24px;">
+    Equipment
+    </div>
+  
+      <table border =1 padding="5">
+        <tr><th>P</th>
+          <th>Item</th>
+          <th>#</th>
+          <th>cost</th>
+          <th>weight</th>
+          <th>description</th>
+          <th>worn</th>
+        </tr>
+  {% for i in charx.inventory %}
+        <tr><td>
+  
+          <form action="edit" method="post" target="editresult" id="{{i}}_checked"> 
+            <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} useasresource"> 
+            <input type="hidden" value="edit" name="action">
+             <input type="checkbox" onclick="javascript: submit()" ; value="1" name="text" style="border:0;width:12px;" {% if charx.inventory[i]['useasresource']>=1 %}checked{% endif %}>
+            </form>
+  
+        </td>
+          <td> 
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} itemname"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{charx.inventory[i].itemname }}" name="text" style="border:0;width:100px;"  onchange="javascript: submit()"> </form> 
+          </td>
+          <td> 
+            
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} itemcount"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{charx.inventory[i].itemcount }}" name="text" style="border:0;width:20px;"  onchange="javascript: submit()"> </form> 
+            </td>
+          <td> 
+            
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} value"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{charx.inventory[i].value }}" name="text" style="border:0;width:30px;"  onchange="javascript: submit()"> </form> 
+          </td>
+          <td> 
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} itemweight"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{charx.inventory[i].itemweight }}" name="text" style="border:0;width:30px;"  onchange="javascript: submit()"> </form> 
+  
+  
+          </td>
+          <td> 
+            
+            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} itemcontent"> <input type="hidden" value="edit" name="action"> <textarea name="text" style="border:0;height: 1em;"  onchange="javascript: submit()">{{charx.inventory[i].itemcontent }}</textarea>  </form> 
+          </td>
+          <td>
+          <form action="edit" method="post" target="editresult" id="{{ab}}_checked"> 
+            <input type="hidden" name="key" value="{{ charx.key }} inventory {{ i }} worn"> 
+            <input type="hidden" value="edit" name="action">
+             <input type="checkbox" onclick="javascript: submit()" ; value="{{ charx.inventory[i]['worn'] }}" name="text" style="border:0;width:12px;" {% if charx.inventory[i]['worn']>=1 %}checked{% endif %}>
+            </form> 
+  
+            </td>
+        </tr>
+  {% endfor %}
+      </table>
+      <form action="sheetadd" method="post" >  <input type="hidden" name="key" value="{{ charx.key }}"> <input type="hidden" value="inventory_add" name="action"> Add <input list="plist" type="text" name="item" style="border:0;width:200px;">
+        <datalist id="plist">
+    
+            <option value='Shield'>
+        </datalist>
+    </form>
+</div>
+<div id="tab6" class="tabcontent"><div class="grid-2"><div>
+
+  Mod list<table border="1">
+    <tr>
+      <td>
+        Mod Name
+      </td>
+      <td>
+        Filter
+      </td>
+      <td>
+        Value
+      </td>
+      <td>
+        Used
+      </td>
+    </tr>
+    {% for m in charx.mod_list %}
+    <tr>
+      <td>            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} name"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ m.name }}" name="text" style="border:0;width:100px;"  onchange="javascript: submit()"> </form> 
+      
+      </td>
+      <td>
+        <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} filter"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ m.filter }}" name="text" style="border:0;width: 60px;"  onchange="javascript: submit()"> </form> 
+      
+      </td>
+      <td>            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} value"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ m.value }}" name="text" style="border:0;width:50px;"  onchange="javascript: submit()"> </form> 
+      
+      </td>
+      <td>
+        <form action="edit" method="post" target="editresult" id="{{ m.name }}_checked"> 
+          <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} checked"> 
+          <input type="hidden" value="edit" name="action">
+           <input type="checkbox" onclick="javascript: submit()" ; value="1" name="text" style="border:0;width:15px;" {% if m.checked >=1 %}checked{% endif %}> 
+          </form> 
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  
+  <form action="sheetadd" method="post" >  <input type="hidden" name="key" value="{{ charx.key }}"> <input type="hidden" value="mod_add" name="action">  <input type="submit" value="Add"></form>
+
+
+</div>
+<div><br><big>Roller:</big>
+
+
+  <form action="edit" method="post" target="framerollerresult">  <input type="hidden" name="key" value="{{ charx.key }} target"> <input type="hidden" value="edit" name="action">Target: <input type="text" value="{{ charx.target }}" name="text" style="border:0;width:104px;"  onchange="javascript: submit()"> </form>
+
+  <form action="roller" method="post" target="framerollerresult">
+    <input type="hidden" name="key" value="{{ charx.key }}"></br>
+  
+    
+    
+          Roll name: <input type="text" name='roll_name' value="a roll"></br>
+          Roll String: <input type="text" name="roll_string" value="1d20"></br>
+  
+  Roll Type: <select name="roll_type"  style="width:100px;border:0;">
+  
+    <option value='all'>All</option>
+    <option value='attack'>Attack</option>
+    <option value='save'>Save</option>
+    <option value='ability'>Abiliy</option>
+    <option value='skill'>Skill</option>
+    <option value='init'>Initiative</option>
+    <option value='healing'>Healing</option>
+    <option value='damage'>Damage</option>
+    
+  
+    </select>
+  
+  
+  <br>
+  
+          
+  
+  <input type="text" name="Modifier_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_mod" value=0 style="width:80px;border:0;"><br>
+  <input type="text" name="Modifier_2_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_2_mod" value=0 style="width:80px;border:0;"><br>
+  
+  <input type="text" placeholder='damage dice' name='damage_dice' ><br>
+  <input type="text" name='damage_bonus' placeholder='damage bonus'><br>
+
+          Quiet: <input type="checkbox" name="quiet" value=True><br>
+  
+  
+       
+        <input type="submit" value="Roll">
+  
+  </form>
+  
+      
+  <iframe height=300 width=400 srcdoc="<p>0</p>" name="framerollerresult">
+    <p>Your browser does not support iframes.</p>
+  </iframe><br><br>
+</div>
+
+</div>
+</div>
+<div id="tab7" class="tabcontent">
+
+
+  <div><h3>In character discord chat:</h3><form action="discordchat" method="post" target="editresult" style="display: inline;"><textarea name="msg"></textarea><input type="hidden" value="{{charx.Name}}" name="character"><input type="hidden" value="{{charx.key}}" name="key"><input type="submit" value="SEND" ></form></div>
+<h3>Text Sheet</h3>
+
+<form action='edit' method='post' target='editresult'>  <input type='hidden' name='key' value='{{ charx.key }} TextSheet'> <textarea name="text">{{ charx.TextSheet }}</textarea><br/><input type='submit' value='edit' name='action'></form>
+  <h3>Other</h3>
+
+<form action='edit' method='post' target='editresult'>  <input type='hidden' name='key' value='{{ charx.key }} Other'> <textarea name="text">{{ charx.Other }}</textarea><br/><input type='submit' value='edit' name='action'></form>
+<br/>
+<iframe height=100 width=200 srcdoc="<p>0</p>" name="editresult">
+  <p>Your browser does not support iframes.</p>
+</iframe>
+<h3>Sheet</h3>
+<form action='edit' method='post' target='editresult'>  <input type='hidden' name='key' value='{{ charx.key }} Sheet'> <textarea name="text">{{ charx.Sheet }}</textarea><br/><input type='submit' value='edit' name='action'></form>
+<br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
+
+
+<!-- END TABS -->
+
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('myModal')">×</span>
+    <p>Some text in the Modal..</p>
+  </div>
+
+</div>
+
+<div id="roller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('roller')">×</span>
+<p>
+
+
+
+<form action="roller" method="post" target="rollerresult">
+    <input type="hidden" name="key" value="{{ charx.key }}"/>
+
+		
+<iframe height=400 width=200 srcdoc="<p>0</p>" name="rollerresult">
+  <p>Your browser does not support iframes.</p>
+</iframe>
+
+
+	
+			<input type="hidden" name='roll_name' id='rollnameid'>
+	
+	<div id="rollhtml"></div>
+        Roll String: <input type="text" name="roll_string" value="d20"></br>
+        Target: <input type="number" name="roll_target" value=8></br>
+        Modifier: <input type="number" name="Modifier_mod" value=0>
+
+
+     
+			<input type="submit" value="Roll">
+
+</form>
+
+</p>
+  </div>
+
+</div>
+
+<div id="skillroller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('skillroller')">×</span>
+<div style="display:inline-block;vertical-align:top;text-align:center;">
+<form id="skillrollform" action="roller" method="post" >
+    <input type="hidden" name="key" value="{{ charx.key }}"/>
+	
+			<input type="hidden" name='roll_name' id='skillrollnameid'>
+      <input type="hidden" name='roll_type' value='skill'>
+<input type="hidden" name='Proficiency_Mod_key' id='skillrollkeyid'>
+
+<input type="hidden" name='Attribute_Mod_key' id='attmodkeyid'>
+
+	<div id="skillrollhtml" style="display:inline;"> </div>  <br>
+        Roll String: <input list="rollstring" type="text" autocomplete="off" name="roll_string" placeholder="1d20" style="width:100px;border:0;" id="skillrollstringid">
+
+          <datalist id="rollstring"><option value='1d20'>Normal</option>
+          <option value='2d20kh1'>Advantage</option>
+          <option value='2d20kl1'>Disadvantage</option>
+          
+
+          </datalist>
+        
+        
+        <br>
+        
+        <input type="text" name="Modifier_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_mod" value=0 style="width:70px;border:0;"><br>
+        Quiet: <input type="checkbox" name="quiet" value=True id="skillrollclickquiet"><br>
+
+        <label onclick='rollclick(event,"abilityresponse", "skillrollstringid","skillrollform","skillrollclickquiet")'> Roll</label>
+</form>
+</div>
+
+
+
+  </div>
+
+</div>
+
+<div id="attkroller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('attkroller')">×</span>
+<div style="display:inline-block;vertical-align:top;text-align:center;">
+<form id="attkrollform" action="roller" method="post" >
+    <input type="hidden" name="key" value="{{ charx.key }}"/>
+    <input type="hidden" name="roll_type" value="attack"/>
+	
+			<input type="hidden" name='roll_name' id='attkrollnameid'>
+<!-- <input type="hidden" name='Proficiency_Mod_key' id='attkrollkeyid'>
+
+<input type="hidden" name='Attribute_Mod_key' id='attmodkeyid'> -->
+
+	<div id="attkrollhtml" style="display:inline;"> </div>  <br>
+        Roll String: <input list="rollstring" type="text" id="attkrollstringid" autocomplete="off" name="roll_string"  style="width:100px;border:0;" >
+
+        <datalist id="rollstring"><option value='1d20'>Normal</option>
+        <option value='2d20kh1'>Advantage</option>
+        <option value='2d20kl1'>Disadvantage</option>
+        
+
+        </datalist>
+      
+      
+        <br>
+        
+        <input type="text" name="Modifier_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_mod" value=0 style="width:80px;border:0;"><br>
+        <input type="text" name="Modifier_2_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_2_mod" value=0 style="width:80px;border:0;"><br>
+        <input type="text" name="Modifier_3_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_3_mod" value=0 style="width:80px;border:0;"><br>
+        Quiet: <input type="checkbox" name="quiet" id="attkrollclickquiet" value=True><br>
+
+        <label onclick='rollclick(event,"abilityresponse", "attkrollstringid","attkrollform","attkrollclickquiet")'> Roll</label>
+</form>
+
+<br>Damage<br>
+</div>
+
+
+
+  </div>
+
+</div>
+
+<div id="VariableModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('VariableModal')">×</span>
+<div id="innerVariable"></div>
+  </div>
+
+</div>
+
+<p>
+<a href='home'>Home Page</a>
+</p>
+
+
+<script>
+
+var current_tab = "{{charx.tab}}";
+
+attrs = { {% for attr in charx.abilities %}"{{ attr }}": {{ charx[charx.abilities[attr]] }},{% endfor %} }
+skillattrs = { {% for skat in charx.skill_mods %}"{{ skat }}": "{{ charx.skill_mods[skat].ability }}",{% endfor %} }
+
+function openTabb(evt, tabbName) {
+
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    current_tab = tabbName;
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabbName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function loadFunction() {
+	document.getElementById("{{charx.tab}}").style.display = "block";
+}
+
+
+function openRollerModal(roll) {
+    modal = document.getElementById("roller");
+	rollname = document.getElementById("rollnameid");
+	rollname.value = roll
+    tv = document.getElementById("rollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+
+function openSkillRoller(roll) {
+    modal = document.getElementById("skillroller");
+	rollname = document.getElementById("skillrollnameid");
+	rollname.value = roll
+	key1 = document.getElementById("skillrollkeyid");
+	key1.value = "- "+roll.toLowerCase().replace(/ /g, "_")+"_proficient"
+	key2 = document.getElementById("attmodkeyid");
+
+	key2.value = "- "+skillattrs[roll.toLowerCase().replace(/ /g, "_")]
+    tv = document.getElementById("skillrollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+
+function openAttkRoller(roll) {
+    modal = document.getElementById("attkroller");
+	rollname = document.getElementById("attkrollnameid");
+	rollname.value = roll
+	// key1 = document.getElementById("attkrollkeyid");
+	// key1.value = "- "+roll.toLowerCase().replace(/ /g, "_")+"_proficient"
+	// key2 = document.getElementById("attmodkeyid");
+
+	// key2.value = "- "+attkattrs[roll.toLowerCase().replace(/ /g, "_")]
+    tv = document.getElementById("attkrollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+function attmodchange() {
+	ele1 = document.getElementById("ta3");
+	ele2 = document.getElementById("ta4");
+	ele2.value = getAtt_mod(att_list[ele1.value]) 
+
+
+}
+
+function openModal(name) {
+    modal = document.getElementById(name);
+    modal.style.display = "block";
+}
+function openVModal(val) {
+    modal = document.getElementById("VariableModal");
+    modal.style.display = "block";
+    tv = document.getElementById("innerVariable");
+    tv.innerHTML = val;
+}
+
+function closeModal(name) {
+    modal = document.getElementById(name);
+    modal.style.display = "none";
+}
+function getAtt_modold(att) {
+	if (att < 1) {return -3}
+	if (att < 3) {return -2}
+	if (att < 6) {return -1}
+	if (att < 9) {return 0}
+	if (att < 12) {return 1}
+	if (att < 15) {return 2}
+	if (att > 14) {return 3}
+	return 0;
+
+}
+function getAttMod(att) {
+        return Math.floor(att/2 - 5)
+}
+
+function submitVForm(form_id) {
+	f = document.getElementById(form_id)
+	f.submit()
+}
+
+function rollclick(event, target, rollstr, form_id,quiet) {
+  if (event.altKey) {
+    g = document.getElementById(rollstr)
+    g.value = "2d20kh1"
+
+  }
+  if (event.ctrlKey) {
+    g = document.getElementById(rollstr)
+    g.value = "2d20kl1"
+
+  }
+  if (event.shiftKey) {
+    g = document.getElementById(quiet)
+    g.value = true
+
+  }
+	f = document.getElementById(form_id)
+	sendroll(f,target);
+}
+
+function save_ckick(key) {
+  var w = document.getElementById(key + "_checked");
+
+  w.submit();
+
+}
+
+function tabrefresh() {
+    window.location.href = 'sheet?{{charx.key}}=' + current_tab;
+}
+
+
+function sendroll(f, t) { 
+
+
+
+  var request = new XMLHttpRequest();
+
+  request.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+       
+       document.getElementById(t).innerHTML = request.responseText;
+    }
+  };
+
+
+  request.open( "POST", "roller", true );
+
+  var data	= new FormData(f);
+
+
+
+  request.send( data );
+
+
+      
+}
+
+
+
+
+</script>
+     
+</body>
+
+
+
+
+</html>

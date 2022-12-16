@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <TITLE>{{ charx.Name }}</TITLE>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+    <style>
+    </style>
+</head>
+
+
+
+<body onload="loadFunction()">
+<div>
+  <form id='graph_form' action='listedit' method='post' style="display: inline;"><input type='hidden' name='key' value='{{ charx.key }}'><input type='hidden' name='action' value='edit'><a href='javascript: submitVForm("graph_form")' style="font-size:30px;">
+ {{ charx.name }}</a> </form><form id='json_form' action='listedit' method='post' style="display: inline;"><input type='hidden' name='key' value='{{ charx.key }}'><input type='hidden' name='action' value='json'><a href='javascript: submitVForm("json_form")'><div style="font-size: 8px;display: inline;">
+  json</div></a> </form>
+</div>
+<div>
+
+{{ charx.size }} -  {{ charx.type }}
+</div>
+<div>
+
+Alignment: {{ charx.alignment }} - 
+
+</div>
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab1')">Main</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab2')">Actions</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab3')">Special</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTabb(event, 'tab4')">Other</a></li>
+  <div style="text-align:right;"><a href="javascript:tabrefresh()">Refresh</a>&nbsp;&nbsp; <a href='tracker'>Tracker</a>&nbsp;&nbsp; <a href='home'>Home Page</a></div>
+</ul>
+
+<div id="tab1" class="tabcontent">
+  <div class="grid-2" style="width:max-content">
+<div class="grid-2" style="width:max-content">
+
+  <div><br>
+    {% for ab in charx.abilities %}
+    <form id="{{ ab }}abilityrollform" action="roller" method="post">
+      <input type="hidden" name="key" value="{{ charx.key }}"/>
+    
+        <input type="hidden" name='roll_name' value='{{ charx.ability_names[loop.index0] }}'>
+        <input type="hidden" name='roll_type' value='ability'>
+
+  
+  <input type="hidden" name='Attribute_Mod_mod' value='{{ (charx[ab]/2 - 5) | round(0, 'floor') | int }}'>
+  <input type="hidden" name='roll_string' value='1d20' id="{{ ab }}rollclickability">
+  <input type="hidden" name='quiet' id="{{ ab }}rollclickquiet">
+
+          <label onclick='rollclick(event,"abilityresponse", "{{ ab }}rollclickability","{{ ab }}abilityrollform","{{ ab }}rollclickquiet")'>{{ charx.ability_names[loop.index0] }}: {{ charx[ab] }}  ({{ (charx[ab]/2 - 5) | round(0, 'floor') | int }}) </label>
+  </form>
+  <form id="{{ ab }}saverollform" action="roller" method="post" >
+    <input type="hidden" name="key" value="{{ charx.key }}">
+  
+      <input type="hidden" name='roll_name' value='{{ charx.ability_names[loop.index0] }} Save'>
+      <input type="hidden" name='roll_type' value='save'>
+
+
+<input type="hidden" name='Attribute_Mod_mod' value="{% if charx[charx.abilities[ab]]==None %}{{ (charx[ab]/2 - 5) | round(0, 'floor') | int }}{% else %}{{ charx[charx.abilities[ab]] }}{% endif %}">
+
+<input type="hidden" name='roll_string' value='1d20' id="{{ ab }}rollclicksave">
+<input type="hidden" name='quiet' id="{{ ab }}srollclickquiet">
+        <label onclick='rollclick(event,"abilityresponse", "{{ ab }}rollclicksave","{{ ab }}saverollform", "{{ ab }}srollclickquiet")'> save: {% if charx[charx.abilities[ab]]==None %}{{ (charx[ab]/2 - 5) | round(0, 'floor') | int }}{% else %}{{ charx[charx.abilities[ab]] }}{% endif %}</label>
+</form>
+    
+    {% endfor %}
+
+
+    <form id="initrollform" action="roller" method="post" >
+      <input type="hidden" name="key" value="{{ charx.key }}"/>
+      <input type="hidden" name='Initiative_key' value='- initiative_bonus'>
+    
+        <input type="hidden" name='roll_name' value='Initiative'>
+        <input type="hidden" name='roll_type' value='init'>
+        <input type="hidden" name='quiet' id="initrollclickquiet">
+
+
+  <input type="hidden" name='roll_string' id="rollclickinit">
+
+  <label onclick='rollclick(event,"abilityresponse", "rollclickinit","initrollform","initrollclickquiet")'>Initiative: {{ charx.initiative_bonus }}</label>
+  
+  
+  </form>
+
+
+
+</div>
+    <p>
+    AC: {{ charx.armor_class }} - {{ charx.armor_desc }}<br>
+    Hit Points: {{ charx.hit_points }} - {{ charx.hit_dice }}<br>
+    Speed:<br>
+    {% for sp in charx.speed %} -- {{ sp }}: {{ charx.speed[sp] }}<br>{% endfor %}
+    Perception: {{ charx.perception}}
+    </p>
+    <div>
+    Skills:
+    {% for sk in charx.skills %} 
+    <form id="{{ sk }}skillrollform" action="roller" method="post">
+      <input type="hidden" name="key" value="{{ charx.key }}"/>
+    
+        <input type="hidden" name='roll_name' value='{{ sk }}'>
+        <input type="hidden" name='roll_type' value='skill'>
+        <input type="hidden" name='Bonus_key' value='- skills {{ sk }}'>
+
+  <input type="hidden" name='roll_string' value='1d20' id="{{ sk }}rollclickskill">
+  <input type="hidden" name='quiet' id="{{ sk }}rollclickquiet">
+
+          <label onclick='rollclick(event,"abilityresponse", "{{ sk }}rollclickskill","{{ sk }}skillrollform","{{ sk }}rollclickquiet")'>  -- {{ sk }}: {{ charx.skills[sk] }}</label>
+  </form>{% endfor %}
+</div>
+    <p>
+      damage_vulnerabilities: {{ charx.damage_vulnerabilities }}<br>
+      damage_resistances: {{ charx.damage_resistances }}<br>
+      damage_immunities: {{ charx.damage_immunities }}<br>
+      condition_immunities: {{ charx.condition_immunities }}<br>
+      languages: {{ charx.languages }}<br>
+      challenge_rating: {{ charx.challenge_rating }}<br>
+      reactions: {{ charx.reactions }}<br>
+     
+    </p>
+   
+</div>
+ <div id="abilityresponse"></div>
+</div>
+</div>
+
+
+<div id="tab2" class="tabcontent">
+<div class="grid-2">
+
+  <div>
+
+
+  <table border="1"><tr><td></td><td></td><td>Bonus</td><td>Damage</td></tr>
+  {% for ac in charx.actions%}<tr>
+    <td>
+      {% if 'attack_bonus' in ac %}
+      <form id="{{ ac['name'] }}attackrollform" action="roller" method="post">
+        <input type="hidden" name="key" value="{{ charx.key }}"/>
+      
+          <input type="hidden" name='roll_name' value='{{ ac['name'] }}'>
+          <input type="hidden" name='roll_type' value='attack'>
+  
+    
+    <input type="hidden" name='Attack_bonus_mod' value='{{ ac['attack_bonus'] }}'>
+    <input type="hidden" name='roll_string' value='1d20' id="{{ ac['name'] }}rollclickattack">
+    <input type="hidden" name='quiet' id="{{ ac['name'] }}rollclickquiet">
+    <input type="hidden" name='damage_dice' value='{{ ac['damage_dice'] }}'>
+    <input type="hidden" name='damage_bonus' value='{{ ac['damage_bonus'] }}'>
+  
+            <label onclick='rollclick(event,"actionresponse", "{{ ac["name"] }}rollclickattack","{{ ac["name"] }}attackrollform","{{ ac["name"] }}rollclickquiet")'>{{ ac['name'] }}</label>
+    </form>
+    {% else %}{{ ac['name'] }}{% endif %}
+      </td><td>{{ ac['desc'] }}</td>
+    <td>{{ ac['attack_bonus'] }}</td><td>{% if 'attack_bonus' in ac %}
+      <form id="{{ ac['name'] }}damagerollform" action="roller" method="post">
+        <input type="hidden" name="key" value="{{ charx.key }}"/>
+      
+          <input type="hidden" name='roll_name' value='{{ ac['name'] }} Damage'>
+          <input type="hidden" name='roll_type' value='damage'>
+  
+    
+    
+    <input type="hidden" name='roll_string' value='{{ ac['damage_dice'] }}{% if 'damage_bonus' in ac %} + {{ ac['damage_bonus'] }}{% endif %}' id="{{ ac['name'] }}rollclickdamage">
+    <input type="hidden" name='quiet' id="{{ ac['name'] }}rollclickquietd">
+  
+            <label onclick='rollclick(event,"actionresponse", "{{ ac["name"] }}rollclickdamage","{{ ac["name"] }}damagerollform","{{ ac["name"] }}rollclickquietd")'>{{ ac['damage_dice'] }}{% if 'damage_bonus' in ac %} + {{ ac['damage_bonus'] }}{% endif %}</label>
+    </form>      {% endif %}
+      </td>
+  </tr>
+{% endfor %}
+  </table>
+
+  Mod list<table border="1">
+    <tr>
+      <td>
+        Mod Name
+      </td>
+      <td>
+        Filter
+      </td>
+      <td>
+        Value
+      </td>
+      <td>
+        Used
+      </td>
+    </tr>
+    {% for m in charx.mod_list %}
+    <tr>
+      <td>            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} name"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ m.name }}" name="text" style="border:0;width:100px;"  onchange="javascript: submit()"> </form> 
+      
+      </td>
+      <td>
+        <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} filter"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ m.filter }}" name="text" style="border:0;width: 60px;"  onchange="javascript: submit()"> </form> 
+      
+      </td>
+      <td>            <form action="edit" method="post" target="editresult">  <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} value"> <input type="hidden" value="edit" name="action"> <input type="text" value="{{ m.value }}" name="text" style="border:0;width:50px;"  onchange="javascript: submit()"> </form> 
+      
+      </td>
+      <td>
+        <form action="edit" method="post" target="editresult" id="{{ m.name }}_checked"> 
+          <input type="hidden" name="key" value="{{ charx.key }} mod_list {{ loop.index0 }} checked"> 
+          <input type="hidden" value="edit" name="action">
+           <input type="checkbox" onclick="javascript: submit()" ; value="1" name="text" style="border:0;width:15px;" {% if m.checked >=1 %}checked{% endif %}> 
+          </form> 
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+    
+  <form action="sheetadd" method="post" >  <input type="hidden" name="key" value="{{ charx.key }}"> <input type="hidden" value="mod_add" name="action">  <input type="submit" value="Add"></form>
+
+  </div>
+  
+<div id="actionresponse"></div>
+
+</div>
+                
+</div>
+<!--  tab 3 ####################### -->
+
+
+<div id="tab3" class="tabcontent">
+  <p>
+Legendary: {{ charx.legendary_desc }}<br>
+<table border="1"><tr>
+  {% for ac in charx.legendary_actions%}<tr>
+    <td>{{ ac['name'] }}</td><td>{{ ac['desc'] }}</td>
+    
+  </tr>
+{% endfor %}
+
+</table>
+<p>
+  Special Abilities:<br>
+  <table border="1"><tr>
+    {% for ac in charx.special_abilities%}<tr>
+      <td>{{ ac['name'] }}</td><td>{{ ac['desc'] }}</td>
+      
+    </tr>
+  {% endfor %}
+    </table>
+</table>
+  <p>
+    Spell List:<br>
+
+    {% for ac in charx.spell_list%}
+<a href="{{ ac }}" target="_blank">{{ ac }}</a><br>
+    {% endfor %}
+
+    
+      </p>
+  </p>
+
+ 
+  
+
+</div>
+<div id="tab4" class="tabcontent">
+
+<p><a href='{{ charx.link }}'' target='_blank'><h2>LINK</h2></a></p>
+  <div><h3>In character discord chat:</h3><form action="discordchat" method="post" target="editresult" style="display: inline;"><textarea name="msg"></textarea><input type="hidden" value="{{charx.Name}}" name="character"><input type="hidden" value="{{charx.key}}" name="key"><input type="submit" value="SEND" ></form></div>
+<h3>Text Sheet</h3>
+
+<form action='edit' method='post' target='editresult'>  <input type='hidden' name='key' value='{{ charx.key }} TextSheet'> <textarea name="text">{{ charx.TextSheet }}</textarea><br/><input type='submit' value='edit' name='action'></form>
+  <h3>Other</h3>
+
+<form action='edit' method='post' target='editresult'>  <input type='hidden' name='key' value='{{ charx.key }} Other'> <textarea name="text">{{ charx.Other }}</textarea><br/><input type='submit' value='edit' name='action'></form>
+<br/>
+<iframe height=100 width=200 srcdoc="<p>0</p>" name="editresult">
+  <p>Your browser does not support iframes.</p>
+</iframe>
+<h3>Sheet</h3>
+<form action='edit' method='post' target='editresult'>  <input type='hidden' name='key' value='{{ charx.key }} Sheet'> <textarea name="text">{{ charx.Sheet }}</textarea><br/><input type='submit' value='edit' name='action'></form>
+<br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
+
+
+<!-- END TABS -->
+
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('myModal')">×</span>
+    <p>Some text in the Modal..</p>
+  </div>
+
+</div>
+
+<div id="roller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('roller')">×</span>
+<p>
+
+
+
+<form action="roller" method="post" target="rollerresult">
+    <input type="hidden" name="key" value="{{ charx.key }}"/>
+
+		
+<iframe height=400 width=200 srcdoc="<p>0</p>" name="rollerresult">
+  <p>Your browser does not support iframes.</p>
+</iframe>
+
+
+	
+			<input type="hidden" name='roll_name' id='rollnameid'>
+	
+	<div id="rollhtml"></div>
+        Roll String: <input type="text" name="roll_string" value="d20"></br>
+        Target: <input type="number" name="roll_target" value=8></br>
+        Modifier: <input type="number" name="Modifier_mod" value=0>
+
+
+     
+			<input type="submit" value="Roll">
+
+</form>
+
+</p>
+  </div>
+
+</div>
+
+<div id="skillroller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('skillroller')">×</span>
+<div style="display:inline-block;vertical-align:top;text-align:center;">
+<form id="skillrollform" action="roller" method="post" >
+    <input type="hidden" name="key" value="{{ charx.key }}"/>
+	
+			<input type="hidden" name='roll_name' id='skillrollnameid'>
+<input type="hidden" name='Proficiency_Mod_key' id='skillrollkeyid'>
+
+<input type="hidden" name='Attribute_Mod_key' id='attmodkeyid'>
+
+	<div id="skillrollhtml" style="display:inline;"> </div>  <br>
+        Roll String: <input list="rollstring" type="text" autocomplete="off" name="roll_string" placeholder="1d20" style="width:100px;border:0;" id="skillrollstringid">
+
+          <datalist id="rollstring"><option value='1d20'>Normal</option>
+          <option value='2d20kh1'>Advantage</option>
+          <option value='2d20kl1'>Disadvantage</option>
+          
+
+          </datalist>
+        
+        
+        <br>
+        
+        <input type="text" name="Modifier_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_mod" value=0 style="width:70px;border:0;"><br>
+        Quiet: <input type="checkbox" name="quiet" value=True id="skillrollclickquiet"><br>
+
+        <label onclick='rollclick(event,"abilityresponse", "skillrollstringid","skillrollform","skillrollclickquiet")'> Roll</label>
+</form>
+</div>
+
+
+
+  </div>
+
+</div>
+
+<div id="attkroller" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('attkroller')">×</span>
+<div style="display:inline-block;vertical-align:top;text-align:center;">
+<form id="attkrollform" action="roller" method="post" >
+    <input type="hidden" name="key" value="{{ charx.key }}"/>
+	
+			<input type="hidden" name='roll_name' id='attkrollnameid'>
+<!-- <input type="hidden" name='Proficiency_Mod_key' id='attkrollkeyid'>
+
+<input type="hidden" name='Attribute_Mod_key' id='attmodkeyid'> -->
+
+	<div id="attkrollhtml" style="display:inline;"> </div>  <br>
+        Roll String: <input list="rollstring" type="text" id="attkrollstringid" autocomplete="off" name="roll_string"  style="width:100px;border:0;" >
+
+        <datalist id="rollstring"><option value='1d20'>Normal</option>
+        <option value='2d20kh1'>Advantage</option>
+        <option value='2d20kl1'>Disadvantage</option>
+        
+
+        </datalist>
+      
+      
+        <br>
+        
+        <input type="text" name="Modifier_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_mod" value=0 style="width:80px;border:0;"><br>
+        <input type="text" name="Modifier_2_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_2_mod" value=0 style="width:80px;border:0;"><br>
+        <input type="text" name="Modifier_3_name" placeholder="Modifier Name" style="width:100px;border:0;">: <input type="text" name="Modifier_3_mod" value=0 style="width:80px;border:0;"><br>
+        Quiet: <input type="checkbox" name="quiet" id="attkrollclickquiet" value=True><br>
+
+        <label onclick='rollclick(event,"abilityresponse", "attkrollstringid","attkrollform","attkrollclickquiet")'> Roll</label>
+</form>
+</div>
+
+
+
+  </div>
+
+</div>
+
+<div id="VariableModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close" onClick="closeModal('VariableModal')">×</span>
+<div id="innerVariable"></div>
+  </div>
+
+</div>
+
+<p>
+<a href='home'>Home Page</a>
+</p>
+
+
+<script>
+
+var current_tab = "{{charx.tab}}";
+
+
+function openTabb(evt, tabbName) {
+
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    current_tab = tabbName;
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabbName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function loadFunction() {
+	document.getElementById("{{charx.tab}}").style.display = "block";
+}
+
+
+function openRollerModal(roll) {
+    modal = document.getElementById("roller");
+	rollname = document.getElementById("rollnameid");
+	rollname.value = roll
+    tv = document.getElementById("rollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+
+function openSkillRoller(roll) {
+    modal = document.getElementById("skillroller");
+	rollname = document.getElementById("skillrollnameid");
+	rollname.value = roll
+	key1 = document.getElementById("skillrollkeyid");
+	key1.value = "- "+roll.toLowerCase().replace(/ /g, "_")+"_proficient"
+	key2 = document.getElementById("attmodkeyid");
+
+	key2.value = "- "+skillattrs[roll.toLowerCase().replace(/ /g, "_")]
+    tv = document.getElementById("skillrollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+
+function openAttkRoller(roll) {
+    modal = document.getElementById("attkroller");
+	rollname = document.getElementById("attkrollnameid");
+	rollname.value = roll
+	// key1 = document.getElementById("attkrollkeyid");
+	// key1.value = "- "+roll.toLowerCase().replace(/ /g, "_")+"_proficient"
+	// key2 = document.getElementById("attmodkeyid");
+
+	// key2.value = "- "+attkattrs[roll.toLowerCase().replace(/ /g, "_")]
+    tv = document.getElementById("attkrollhtml");
+    tv.innerHTML = roll;
+    modal.style.display = "block";
+}
+function attmodchange() {
+	ele1 = document.getElementById("ta3");
+	ele2 = document.getElementById("ta4");
+	ele2.value = getAtt_mod(att_list[ele1.value]) 
+
+
+}
+
+function openModal(name) {
+    modal = document.getElementById(name);
+    modal.style.display = "block";
+}
+function openVModal(val) {
+    modal = document.getElementById("VariableModal");
+    modal.style.display = "block";
+    tv = document.getElementById("innerVariable");
+    tv.innerHTML = val;
+}
+
+function closeModal(name) {
+    modal = document.getElementById(name);
+    modal.style.display = "none";
+}
+function getAtt_modold(att) {
+	if (att < 1) {return -3}
+	if (att < 3) {return -2}
+	if (att < 6) {return -1}
+	if (att < 9) {return 0}
+	if (att < 12) {return 1}
+	if (att < 15) {return 2}
+	if (att > 14) {return 3}
+	return 0;
+
+}
+function getAttMod(att) {
+        return Math.floor(att/2 - 5)
+}
+
+function submitVForm(form_id) {
+	f = document.getElementById(form_id)
+	f.submit()
+}
+
+function rollclick(event, target, rollstr, form_id,quiet) {
+  if (event.altKey) {
+    g = document.getElementById(rollstr)
+    g.value = "2d20kh1"
+
+  }
+  if (event.ctrlKey) {
+    g = document.getElementById(rollstr)
+    g.value = "2d20kl1"
+
+  }
+  if (event.shiftKey) {
+    g = document.getElementById(quiet)
+    g.value = true
+
+  }
+	f = document.getElementById(form_id)
+	sendroll(f, target);
+}
+
+function save_ckick(key) {
+  var w = document.getElementById(key + "_checked");
+
+  w.submit();
+
+}
+
+function tabrefresh() {
+    window.location.href = 'sheet?{{charx.key}}=' + current_tab;
+}
+
+
+function sendroll(f, t) { 
+
+
+
+  var request = new XMLHttpRequest();
+
+  request.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+       
+       document.getElementById(t).innerHTML = request.responseText;
+    }
+  };
+
+
+  request.open( "POST", "roller", true );
+
+  var data	= new FormData(f);
+
+
+
+  request.send( data );
+
+
+      
+}
+
+
+
+
+</script>
+     
+</body>
+
+
+
+
+</html>
