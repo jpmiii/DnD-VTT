@@ -1,0 +1,175 @@
+var tables = {
+    "ability_names": [
+        "Strength",
+        "Dexterity",
+        "Constitution",
+        "Intelligence",
+        "Wisdom",
+        "Charisma"
+    ],
+    "abilities": {
+        "strength": "strength_mod",
+        "dexterity": "dexterity_mod",
+        "constitution": "constitution_mod",
+        "intelligence": "intelligence_mod",
+        "wisdom": "wisdom_mod",
+        "charisma": "charisma_mod"
+    },
+    "saving_throws": [
+        [
+            "strength_save_bonus",
+            "strength_save_proficient"
+        ],
+        [
+            "dexterity_save_bonus",
+            "dexterity_save_proficient"
+        ],
+        [
+            "constitution_save_bonus",
+            "constitution_save_proficient"
+        ],
+        [
+            "intelligence_save_bonus",
+            "intelligence_save_proficient"
+        ],
+        [
+            "wisdom_save_bonus",
+            "wisdom_save_proficient"
+        ],
+        [
+            "charisma_save_bonus",
+            "charisma_save_proficient"
+        ]
+    ],
+    "skill_names": [
+        "Acrobatics",
+        "Animal Handling",
+        "Arcana",
+        "Athletics",
+        "Deception",
+        "History",
+        "Insight",
+        "Intimidation",
+        "Investigation",
+        "Medicine",
+        "Nature",
+        "Perception",
+        "Performance",
+        "Persuasion",
+        "Religion",
+        "Sleight of Hand",
+        "Stealth",
+        "Survival"
+    ],
+    "skill_mods": {
+        "acrobatics": {
+            "bonus": "acrobatics_bonus",
+            "prof": "acrobatics_proficient",
+            "ability": "dexterity_mod"
+        },
+        "animal_handling": {
+            "bonus": "animal_handling_bonus",
+            "prof": "animal_handling_proficient",
+            "ability": "wisdom_mod"
+        },
+        "arcana": {
+            "bonus": "arcana_bonus",
+            "prof": "arcana_proficient",
+            "ability": "intelligence_mod"
+        },
+        "athletics": {
+            "bonus": "athletics_bonus",
+            "prof": "athletics_proficient",
+            "ability": "strength_mod"
+        },
+        "deception": {
+            "bonus": "deception_bonus",
+            "prof": "deception_proficient",
+            "ability": "charisma_mod"
+        },
+        "history": {
+            "bonus": "history_bonus",
+            "prof": "history_proficient",
+            "ability": "intelligence_mod"
+        },
+        "insight": {
+            "bonus": "insight_bonus",
+            "prof": "insight_proficient",
+            "ability": "wisdom_mod"
+        },
+        "intimidation": {
+            "bonus": "intimidation_bonus",
+            "prof": "intimidation_proficient",
+            "ability": "charisma_mod"
+        },
+        "investigation": {
+            "bonus": "investigation_bonus",
+            "prof": "investigation_proficient",
+            "ability": "intelligence_mod"
+        },
+        "medicine": {
+            "bonus": "medicine_bonus",
+            "prof": "medicine_proficient",
+            "ability": "wisdom_mod"
+        },
+        "nature": {
+            "bonus": "nature_bonus",
+            "prof": "nature_proficient",
+            "ability": "intelligence_mod"
+        },
+        "perception": {
+            "bonus": "perception_bonus",
+            "prof": "perception_proficient",
+            "ability": "wisdom_mod"
+        },
+        "performance": {
+            "bonus": "performance_bonus",
+            "prof": "performance_proficient",
+            "ability": "charisma_mod"
+        },
+        "persuasion": {
+            "bonus": "persuasion_bonus",
+            "prof": "persuasion_proficient",
+            "ability": "charisma_mod"
+        },
+        "religion": {
+            "bonus": "religion_bonus",
+            "prof": "religion_proficient",
+            "ability": "intelligence_mod"
+        },
+        "sleight_of_hand": {
+            "bonus": "sleight_of_hand_bonus",
+            "prof": "sleight_of_hand_proficient",
+            "ability": "dexterity_mod"
+        },
+        "stealth": {
+            "bonus": "stealth_bonus",
+            "prof": "stealth_proficient",
+            "ability": "dexterity_mod"
+        },
+        "survival": {
+            "bonus": "survival_bonus",
+            "prof": "survival_proficient",
+            "ability": "wisdom_mod"
+        }
+    },
+    "skill_abilities": {
+        "acrobatics_ability": "dexterity_mod",
+        "animal_handling_ability": "wisdom_mod",
+        "arcana_ability": "intelligence_mod",
+        "athletics_ability": "strength_mod",
+        "deception_ability": "charisma_mod",
+        "history_ability": "intelligence_mod",
+        "insight_ability": "wisdom_mod",
+        "intimidation_ability": "charisma_mod",
+        "investigation_ability": "intelligence_mod",
+        "medicine_ability": "wisdom_mod",
+        "nature_ability": "intelligence_mod",
+        "perception_ability": "wisdom_mod",
+        "performance_ability": "charisma_mod",
+        "persuasion_ability": "charisma_mod",
+        "religion_ability": "intelligence_mod",
+        "sleight_of_hand_ability": "dexterity_mod",
+        "stealth_ability": "dexterity_mod",
+        "survival_ability": "wisdom_mod"
+    }}
