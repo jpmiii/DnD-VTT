@@ -55,12 +55,13 @@ function char_out(msg) {
 		_type: "attribute",
 
 	});
-	var loki = findObjs({
+	var pb = findObjs({
 		_characterid: toke.get('represents'),
 		_type: "attribute",
 		name: "pb",
 
-	});
+	})[0];
+
 	var sheettype = findObjs({
 		_characterid: toke.get('represents'),
 		_type: "attribute",
@@ -68,10 +69,77 @@ function char_out(msg) {
 
 	})[0];
 	//log(atts)
-	var out = tables;
+	var out = {};
+	out['abilities'] = {};
+	out['skills'] = {};
+	
+	tables['ability_names'].forEach(function(att) {
+	    log(att.toLowerCase());
+	    var t2 = {};
+	    t2[att] = {};
+	    
+	    
+    	var att2 = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: att.toLowerCase() ,
+    		
+    	})[0];
+    	//log(att2)
+    	if (att2) {
+    	    t2[att]['value'] = parseInt(att2.get('current'));
+    	}
+    	
+    	var att2 = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: att.toLowerCase() + "_save_prof" ,
+    		
+    	})[0];
+    	//log(att2)
+    	if (att2) {
+    	    if (att2.get('current') == 0) {
+    	        t2[att]['prof'] = 0;
+    	    } else {
+    	        t2[att]['prof'] = parseInt(pb.get('current'));
+    	    }
+    	    
+    	}
+    	t2[att]['mod'] = Math.floor((t2[att]['value']-10)/2);
+    	t2[att]['save_mod'] = t2[att]['mod'] + t2[att]['prof'];
+    	Object.assign(out['abilities'], t2);
+	    
+	});
 
+    tables['skill_names'].forEach(function(sns) {
+        var sn = sns.toLowerCase().replace(/ /g,"_")
 
+	    var t2 = {};
+	    t2[sn] = {};
+	    
+	    
+    	var sn2 = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: sn + "_prof" ,
+    		
+    	})[0];
+
+    	if (sn2) {
+    	    if (sn2.get('current') == 0) {
+    	        t2[sn]['prof'] = 0;
+    	    } else {
+    	        t2[sn]['prof'] = parseInt(pb.get('current'));
+    	    
+    	    }
+
+    	}
+    	t2[sn]['ability'] = tables['skill_abilities'][sn];
+    	Object.assign(out['skills'], t2);
+    });
 	log("start.........................................")
+	sheettables = [];
+	sout = {}
 	_.each(atts, function(obj) {
         var n = obj.get('name')
         var val = obj.get('current');
@@ -79,26 +147,16 @@ function char_out(msg) {
             val = parseInt(val)
         }
 
-        if (!String(val).startsWith('@{w')) { 
-
-            if (String(n).includes("kingdom_drop_data")) {
-                out[n] = JSON.parse(val);
-            }
-            if (n.endsWith('_prof')) {
-                n = n + "icient";
-                if (String(val).startsWith('(@{pb')) {
-                    val = loki[0].get('current');
-                } else {
-                    val = 0;
-                }
-            }
-            
-
+        if (!String(val).startsWith('@{w')) {
+    
             if (n.startsWith('repeating_')) {
                 
                 var ary = n.split("_")
                 var c = ary[0].length + ary[1].length + ary[2].length +3;
                 var t1 = {};
+                if (!sheettables.includes(ary[1])) {
+                    sheettables.push(ary[1]);
+                }
                 t1[n.slice(c)] = val;
                 if (ary[1]== 'inventory') {
                     if (n.slice(c) == 'useasresource') {
@@ -109,34 +167,47 @@ function char_out(msg) {
                         t1['worn'] = 1;
                         t1['value'] = 1;
                     }
-
+    
                 }
                 var t2 = {}
                 t2[ary[2]] = t1;
-                if (ary[1] in out) {
-                    if (ary[2] in out[ary[1]]) {
-                        Object.assign(out[ary[1]][ary[2]],t1)
+                if (ary[1] in sout) {
+                    if (ary[2] in sout[ary[1]]) {
+                        Object.assign(sout[ary[1]][ary[2]],t1)
                     } else {
-                        Object.assign(out[ary[1]], t2);
+                        Object.assign(sout[ary[1]], t2);
                     }
                     
                 } else {
-                    out[ary[1]] = t2;
+                    sout[ary[1]] = t2;
                 }
                 
             } else {
-                out[n] = val;
+                //out[n] = val;
             } 
         }
-        
+    });
+    
 
-	    
-	});
-	if ('pb' in out) {} else {
-	    out['pb'] = 0;
-	}
+	log(sheettables);
+
 	out['hp_max'] = out['hp'];
 	out['ac_desc'] = "ac desc";
+	//Object.assign(out,sout);
+	sheettables.forEach(function (t) {
+	    var pt =t;
+	    if (pt.startsWith("spell-")) {
+	        pt="spells";
+	    }
+	    if (pt in out) {} else {
+	        out[pt] = [];
+	    }
+	    
+	    _.each(sout[t], function (obj) {
+	        out[pt].push(obj);
+	    });
+	    
+	});
 	var tout = JSON.stringify(out,null,2)
 	if (sheettype == "npc") {
     	var outbox = findObjs({
