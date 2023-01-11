@@ -14,6 +14,9 @@ on("chat:message", function(msg) {
 		var args = msg.content.split(" ");
 		if (args[0] == "!out") {
 		    char_out(msg);
+		} else 
+		if (args[0] == "!allout") {
+		    char_out_all(msg);
 		}
 	}
 });
@@ -41,7 +44,7 @@ function char_out(msg) {
 	if (!msg.selected) { return; }
 	//log(msg.selected);
 	var objid = msg.selected[0];
-	//log(objid['_id']);
+	log(objid['_id']);
 	var toke = getObj("graphic", objid['_id']);
 	sendGMPing(toke.get('left'), toke.get('top'), toke.get('pageid'), "", true);
 	sendChat("Out Character", "/w gm " + toke.get('name'));
@@ -52,8 +55,23 @@ function char_out(msg) {
 		_type: "attribute",
 
 	});
+	var loki = findObjs({
+		_characterid: toke.get('represents'),
+		_type: "attribute",
+		name: "pb",
+
+	});
+	var sheettype = findObjs({
+		_characterid: toke.get('represents'),
+		_type: "attribute",
+		name: "charactersheet_type",
+
+	})[0];
 	//log(atts)
 	var out = tables;
+
+
+	log("start.........................................")
 	_.each(atts, function(obj) {
         var n = obj.get('name')
         var val = obj.get('current');
@@ -62,23 +80,36 @@ function char_out(msg) {
         }
 
         if (!String(val).startsWith('@{w')) { 
+
+            if (String(n).includes("kingdom_drop_data")) {
+                out[n] = JSON.parse(val);
+            }
             if (n.endsWith('_prof')) {
                 n = n + "icient";
                 if (String(val).startsWith('(@{pb')) {
-                    val = parseInt(out['pb']);
+                    val = loki[0].get('current');
                 } else {
                     val = 0;
                 }
             }
+            
+
             if (n.startsWith('repeating_')) {
                 
                 var ary = n.split("_")
                 var c = ary[0].length + ary[1].length + ary[2].length +3;
                 var t1 = {};
                 t1[n.slice(c)] = val;
-                if ((ary[1]== 'inventory') && (n.slice(c) == 'useasresource')) {
-                   t1['worn'] = 1;
-                   t1['value'] = 1;
+                if (ary[1]== 'inventory') {
+                    if (n.slice(c) == 'useasresource') {
+                        t1['worn'] = 1;
+                        t1['value'] = 1;
+                    } else {
+                        t1['useasresource'] = 0;
+                        t1['worn'] = 1;
+                        t1['value'] = 1;
+                    }
+
                 }
                 var t2 = {}
                 t2[ary[2]] = t1;
@@ -101,15 +132,113 @@ function char_out(msg) {
 
 	    
 	});
+	if ('pb' in out) {} else {
+	    out['pb'] = 0;
+	}
 	out['hp_max'] = out['hp'];
 	out['ac_desc'] = "ac desc";
 	var tout = JSON.stringify(out,null,2)
-	var outbox = findObjs({
+	if (sheettype == "npc") {
+    	var outbox = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: "npc_mythic_actions_desc",
+    
+    	});
+    	outbox[0].set("current", tout)
+	} else {
+    	var outbox = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: "allies_and_organizations",
+    
+    	});
+    	outbox[0].set("current", tout)	    
+	}
+}
+function char_out_all(msg) {
+    
+	if (!msg.selected) { return; }
+	//log(msg.selected);
+	var objid = msg.selected[0];
+	//log(objid['_id']);
+	var toke = getObj("graphic", objid['_id']);
+	sendGMPing(toke.get('left'), toke.get('top'), toke.get('pageid'), "", true);
+	sendChat("Out Character", "/w gm " + toke.get('name'));
+
+	var sheettype = findObjs({
 		_characterid: toke.get('represents'),
 		_type: "attribute",
-		name: "allies_and_organizations",
+		name: "charactersheet_type",
+
+	})[0];
+	//log(at
+	var atts = findObjs({
+		_characterid: toke.get('represents'),
+		_type: "attribute",
 
 	});
-	outbox[0].set("current", tout)
+	//log(atts)
+	var out = {};
+
+
+	log("start...............all...................")
+	_.each(atts, function(obj) {
+        var n = obj.get('name')
+        var val = obj.get('current');
+        if (isInt(val)) {
+            val = parseInt(val)
+        }
+
+        if (!String(val).startsWith('#@{w')) { 
+
+            
+
+            if (n.startsWith('repeating_')) {
+                
+                var ary = n.split("_")
+                var c = ary[0].length + ary[1].length + ary[2].length +3;
+                var t1 = {};
+                t1[n.slice(c)] = val;
+
+                var t2 = {}
+                t2[ary[2]] = t1;
+                if (ary[1] in out) {
+                    if (ary[2] in out[ary[1]]) {
+                        Object.assign(out[ary[1]][ary[2]],t1)
+                    } else {
+                        Object.assign(out[ary[1]], t2);
+                    }
+                    
+                } else {
+                    out[ary[1]] = t2;
+                }
+                
+            } else {
+                out[n] = val;
+            } 
+        }
+        
+
+	    
+	});
+
+	var tout = JSON.stringify(out,null,2)
+	if (sheettype == "npc") {
+    	var outbox = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: "npc_mythic_actions_desc",
     
+    	});
+    	outbox[0].set("current", tout)
+	} else {
+    	var outbox = findObjs({
+    		_characterid: toke.get('represents'),
+    		_type: "attribute",
+    		name: "allies_and_organizations",
+    
+    	});
+    	outbox[0].set("current", tout)	    
+	}
 }
